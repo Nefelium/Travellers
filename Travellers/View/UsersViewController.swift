@@ -98,7 +98,6 @@ class UsersViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
-      // Database.instance.fillTravellers()
         
     }
 

@@ -29,13 +29,21 @@ class Database {
     private let city = Expression<String>("city")
     
     private init() {
+        
+        do {
         let path = NSSearchPathForDirectoriesInDomains(
             .documentDirectory, .userDomainMask, true
             ).first!
 
-        do {
+        // create parent directory if it doesn’t exist
+        try FileManager.default.createDirectory(
+            atPath: path, withIntermediateDirectories: true, attributes: nil
+        )
+        
+        
             db = try Connection("\(path)/db.sqlite3")
             try db?.execute("PRAGMA foreign_keys = ON;")
+            print(path) // вывод пути к базе данных в консоль
         } catch {
             db = nil
             Alerts.alert(title: "Error", message: "Unable to open database")
@@ -368,18 +376,20 @@ class Database {
         return false
     }
     
-    func deleteCity(uid: Int) {
+    func deleteCity(uid: Int) -> Bool {
         do {
             let deletingCity = cities.filter(id == uid)
             if let trav = try db?.pluck(deletingCity) {
                 let deletingTraveller = travellers.filter(city == trav[name])
                 try db!.run(deletingCity.delete())
                 try db!.run(deletingTraveller.delete())
+                self.delegate?.updateData()
+                return true
             }
         } catch {
             Alerts.alert(title: "Error", message: "Delete failed")
         }
-        self.delegate?.updateData()
+        return false
     }
     
     func findUser(uid: Int) -> String {
@@ -422,5 +432,6 @@ class Database {
             Alerts.alert(title: "Error", message: "Insert failed")
         }
     }
+    
 
 }

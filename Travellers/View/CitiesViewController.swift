@@ -37,11 +37,12 @@ class CitiesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     @IBAction func citiesDeleteButton(_ sender: Any) {
         if itemRow != nil {
+            if Database.instance.deleteCity(uid: cities[itemRow!].id) {
             cities.remove(at: itemRow!)
             tableView.deleteRows(at: [IndexPath(row: itemRow!, section: 0)], with: .fade)
-            Database.instance.deleteCity(uid: cities[itemRow!].id)
             cities = Database.instance.getCities()
             tableView.reloadData()
+        }
         }
         
     }
